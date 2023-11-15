@@ -1,3 +1,5 @@
+# Script for renaming fastq files received from Scripps Research.  Requires a sample key with file name string matches and desired name changes to be specified in-script. Takes a directory containing the files to be changed as an argument. 
+
 import os
 import pandas as pd
 
