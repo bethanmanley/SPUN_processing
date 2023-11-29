@@ -16,8 +16,8 @@ def rename_files(excel_file, directory):
 
     # Iterate through each row in the DataFrame
     for index, row in df.iterrows():
-        sampleid = str(row['CCBB'])
-        name = str(row['Sample_Name'])
+        sampleid = str(row['Sequencer_ID'])
+        name = str(row['Sample_ID'])
 
         # Get a list of all file names in the directory
         file_names = os.listdir(directory_path)
