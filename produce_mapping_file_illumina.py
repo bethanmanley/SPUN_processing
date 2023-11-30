@@ -14,8 +14,8 @@ args = parser.parse_args()
 
 # Define sorting function
 def sort_files(file_list):
-    r1_files = sorted([f for f in file_list if f.endswith('R1_001.fastq.gz')])
-    r2_files = sorted([f for f in file_list if f.endswith('R2_001.fastq.gz')])
+    r1_files = sorted([f for f in file_list if '_R1' in f])
+    r2_files = sorted([f for f in file_list if '_R2' in f])
     return r1_files + r2_files
 
 # Get list of fastq files in input folder
@@ -33,9 +33,9 @@ for file_name in fastq_files:
     sample_id = get_sample_id(file_name)
     if sample_id not in output_dict:
         output_dict[sample_id] = {}
-    if '_R1_' in file_name:
+    if '_R1' in file_name:
         output_dict[sample_id]['R1'] = file_name
-    elif '_R2_' in file_name:
+    elif '_R2' in file_name:
         output_dict[sample_id]['R2'] = file_name
 
 
