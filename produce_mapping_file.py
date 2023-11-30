@@ -14,47 +14,45 @@ args = parser.parse_args()
 
 # Define sorting function
 def sort_files(file_list):
-    r1_files = sorted([f for f in file_list if '_R1' in f])
-    r2_files = sorted([f for f in file_list if '_R2' in f])
-    return r1_files + r2_files
+    return sorted(file_list)
 
 # Get list of fastq files in input folder
-fastq_files = sort_files(os.listdir(args.input_folder))
+fastq_files = sort_files([f for f in os.listdir(args.input_folder) if f.endswith('fastq.gz')])
 
 # Define function to extract sample ID
 def get_sample_id(file_name):
-    return file_name.split('_S')[0]
-
-# Initialize output dictionary
-output_dict = {}
-
-# Loop over fastq files and merge pairs with common file name beginnings
-for file_name in fastq_files:
-    sample_id = get_sample_id(file_name)
-    if sample_id not in output_dict:
-        output_dict[sample_id] = {}
-    if '_R1' in file_name:
-        output_dict[sample_id]['R1'] = file_name
-    elif '_R2' in file_name:
-        output_dict[sample_id]['R2'] = file_name
-
-
-# Define function to merge paired files into single column
-def merge_files(file_dict):
-    r1_file = file_dict['R1']
-    r2_file = file_dict['R2']
-    merged_column = f'{r1_file},{r2_file}'
-    return merged_column
+    # Split file name at '_S' or '.' (whichever comes first)
+    parts = file_name.split('_S', 1)
+    if len(parts) == 1:
+        parts = file_name.split('.', 1)
+    return parts[0]
 
 # Open output file for writing
 with open(args.output_file, 'w') as output_file:
     # Write header row
     output_file.write('#SampleID\tfastqFile\tSample_or_Control\n')
+
+    # Initialize output dictionary
+    output_dict = {}
+
+    # Loop over fastq files
+    for file_name in fastq_files:
+        sample_id = get_sample_id(file_name)
+
+        # Include all files in the output, regardless of whether they are paired or single
+        if sample_id not in output_dict:
+            output_dict[sample_id] = {'files': []}
+        output_dict[sample_id]['files'].append(file_name)
+
     # Loop over output dictionary and write rows to output file
     for sample_id, file_dict in output_dict.items():
-        merged_column = merge_files(file_dict)
+        file_list = file_dict['files']
+
         # Determine the value for the Sample_or_Control column
         sample_or_control = "True Sample"
         if sample_id.startswith(("C")):
             sample_or_control = "Control Sample"
-        output_file.write(f'{sample_id}\t{merged_column}\t{sample_or_control}\n')
+
+        # Write each file in the 'fastqFile' column
+        for file_name in file_list:
+            output_file.write(f'{sample_id}\t{file_name}\t{sample_or_control}\n')
