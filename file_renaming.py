@@ -22,7 +22,7 @@ def rename_files(excel_file, directory):
         # Get a list of all file names in the directory
         file_names = os.listdir(directory_path)
 
-        # Find the matching filenames based on the CCBB
+        # Find the matching filenames based on the Sequencer_ID
         matching_files = [filename for filename in file_names if filename.startswith(sampleid.split('id', 1)[0] + 'id')]
 
         for matching_file in matching_files:
